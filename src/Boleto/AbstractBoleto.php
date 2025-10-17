@@ -1496,6 +1496,7 @@ abstract class AbstractBoleto implements BoletoContract
         return $this;
     }
 
+
     /**
      * Retorna os diasProtesto
      *
@@ -1506,6 +1507,37 @@ abstract class AbstractBoleto implements BoletoContract
     public function getDiasProtesto($default = 0)
     {
         return $this->diasProtesto > 0 ? $this->diasProtesto : $default;
+    }
+
+    /**
+     * Seta dias para negativar
+     *
+     * @return AbstractBoleto
+     * @throws Exception
+     */
+
+
+    public function setDiasNegativar($diasNegativar)
+    {
+        $this->diasNegativar = max((int) $diasNegativar, 0);
+
+        if (! empty($this->diasNegativar) && ($this->getDiasBaixaAutomatica() > 0 || $this->getDiasProtesto() > 0)) {
+            throw new ValidationException('Você deve usar dias de negativar, protesto ou dias de baixa, nunca os 3');
+        }
+
+        return $this;
+    }
+    /**
+     * Retorna os dias para negativar
+     *
+     * @param int $default
+     *
+     * @return int
+     */
+
+    public function getDiasNegativar($default = 0)
+    {
+        return $this->diasNegativar > 0 ? $this->diasNegativar : $default;
     }
 
     /**
@@ -2137,9 +2169,9 @@ abstract class AbstractBoleto implements BoletoContract
             if (! $this->getPixChaveTipo()) {
                 throw new ValidationException('Informado chave de Pix porém não foi informado o tipo de chave');
             }
-//            if (! $this->getID()) {
-//                throw new ValidationException('ID necessita ser informado para geração da cobrança');
-//            }
+            //            if (! $this->getID()) {
+            //                throw new ValidationException('ID necessita ser informado para geração da cobrança');
+            //            }
 
             switch ($this->getPixChaveTipo()) {
                 case self::TIPO_CHAVEPIX_CPF:

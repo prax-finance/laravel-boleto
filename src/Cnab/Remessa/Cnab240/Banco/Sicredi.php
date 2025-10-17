@@ -28,6 +28,7 @@ class Sicredi extends AbstractRemessa implements RemessaContract
     const PROTESTO_SEM = '3';
     const PROTESTO_DIAS_CORRIDOS = '1';
     const PROTESTO_NAO_PROTESTAR = '3';
+    const NEGATIVAR_DIAS_CORRIDOS = '8';
     const PROTESTO_AUTOMATICO = '9';
 
     public function __construct(array $params)
@@ -138,8 +139,14 @@ class Sicredi extends AbstractRemessa implements RemessaContract
         $this->add(221, 221, self::PROTESTO_SEM);
         if ($boleto->getDiasProtesto() > 0) {
             $this->add(221, 221, self::PROTESTO_DIAS_CORRIDOS);
+            $this->add(222, 223, Util::formatCnab('9', $boleto->getDiasProtesto(), 2));
+        } elseif ($boleto->getDiasNegativar() > 0) {
+            $this->add(221, 221, self::NEGATIVAR_DIAS_CORRIDOS);
+            $this->add(222, 223, Util::formatCnab('9', $boleto->getDiasNegativar(), 2));
+        } else {
+            $this->add(222, 223, Util::formatCnab('9', 0, 2));
         }
-        $this->add(222, 223, Util::formatCnab('9', $boleto->getDiasProtesto(), 2));
+
         $this->add(224, 224, '1'); // '1' = Baixar / devolver - Utilizar sempre domínio ‘1’ para esse campo.
         $this->add(225, 227, '060'); // Utilizar sempre, nesse campo, 60 dias para baixa/devolução.
         $this->add(228, 229, Util::formatCnab('9', $boleto->getMoeda(), 2));

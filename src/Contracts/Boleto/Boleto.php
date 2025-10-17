@@ -188,6 +188,13 @@ interface Boleto
      *
      * @return mixed
      */
+    public function getDiasNegativar($default = 0);
+
+    /**
+     * @param int $default
+     *
+     * @return mixed
+     */
     public function getTipoProtesto($default = 0);
 
     /**
