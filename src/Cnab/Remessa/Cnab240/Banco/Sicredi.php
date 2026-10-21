@@ -126,10 +126,10 @@ class Sicredi extends AbstractRemessa implements RemessaContract
         $this->add(107, 108, Util::formatCnab('9', $boleto->getEspecieDocCodigo(), 2));
         $this->add(109, 109, Util::formatCnab('9', $boleto->getAceite(), 1));
         $this->add(110, 117, $boleto->getDataDocumento()->format('dmY'));
-        $this->add(118, 118, $boleto->getJuros() ? '1' : '3'); //'1' = Valor por Dia, '3' = Isento
+        $this->add(118, 118, $boleto->getJuros() ? '2' : '3'); //'2' = Taxa Mensal, '3' = Isento
         $this->add(119, 126, $boleto->getJurosApos() == 0 ? '00000000' :
             $boleto->getDataVencimentoApos()->format('dmY'));
-        $this->add(127, 141, Util::formatCnab('9', $boleto->getMoraDia(), 15, 2)); //Valor da mora/dia ou Taxa mensal
+        $this->add(127, 141, Util::formatCnab('9', $boleto->getJuros(), 15, 2)); //Taxa mensal (% ao mês)
         $this->add(142, 142, $boleto->getDesconto() > 0 ? '1' : '0');
         $this->add(143, 150, $boleto->getDesconto() > 0 ? $boleto->getDataDesconto()->format('dmY') : '00000000');
         $this->add(151, 165, Util::formatCnab('9', $boleto->getDesconto(), 15, 2));
@@ -205,7 +205,8 @@ class Sicredi extends AbstractRemessa implements RemessaContract
         $this->add(67, 74, '00000000');
         $this->add(75, 89, Util::formatCnab('9', 0, 13, 2));
         if ($boleto->getMulta() > 0) {
-            $percentualMulta = number_format((($boleto->getMulta() * 100) / $boleto->getValor()), 2);
+            // getMulta() já é o percentual (setMulta recebe %), não converter como se fosse valor em R$
+            $percentualMulta = $boleto->getMulta();
             $this->add(66, 66, '2'); // '2' = Percentual
             $this->add(67, 74, $boleto->getMulta() > 0 ?  $boleto->getDataVencimento()->copy()->addDays($boleto->getMultaApos())->format('dmY') : '00000000');
             $this->add(75, 89, Util::formatCnab('9', $percentualMulta, 13, 2));
